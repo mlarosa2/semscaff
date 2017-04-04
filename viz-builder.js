@@ -447,14 +447,20 @@ fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
 });
 
 if (additionalTools) {
-    let toolsDirective = ``;
+    let toolsDirective = `
+    
+    `;
     fs.writeFile(`${vizName}-tools.directive.js`, toolsDirective, (err) => {
         if (err) {
             throw err;
         } 
         console.log(`${vizName}-tools.directive.js has been created.`);
     });
-    let toolsHTML = ``;
+    let toolsHTML = `
+    <div class="grid12">
+
+    </div>
+    `;
     fs.writeFile(`${vizName}-tools.directive.html`, toolsHTML, (err) => {
         if (err) {
             throw err;
