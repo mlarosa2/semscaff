@@ -109,11 +109,11 @@ const createWidgetName = (vizName) => {
 
 const getDependencies = () => {
     while (true) {
-        answer = rl.question('Path from bower_components: (press s to stop adding dependences) ');
+        answer = rl.question('Path from bower_components: (press s to stop adding dependencies) ');
         if (answer.toLowerCase() === 's') {
             break
         }
-        dependencies.push(answer);
+        dependencies.push(`../bower_components/${answer}`);
     }
 };
 
@@ -251,7 +251,7 @@ buildState();
 
 buildConfigObj();
 
-fs.writeFile('config.json', JSON.stringify(configObj), (err) => {
+fs.writeFile('config.json', JSON.stringify(configObj, null, '\t'), (err) => {
     if (err) {
         throw err;
     }

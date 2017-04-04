@@ -1,1 +1,74 @@
-{"name":"Viz Builder","icon":"widgets/Viz Builder/cogs.svg","widgetList":{"tags":["Visualization","JVChart"]},"showOn":"none","content":{"template":{"name":"jv-viz viz-builder","files":[{"serie":true,"files":["../bower_components/d3_v4/d3.min.js"]},{"files":["resources/js/jvCharts/jvcharts.min.js"]},{"files":["standard/chart/chart.css","resources/js/jvCharts/src/jv.css"]},{"files":["standard/chart/chart.directive.js","standard/jv-viz/jv-viz.directive.js","widgets/viz-builder/viz-builder.directive.js","widgets/viz-builder/viz-builder-tools.directive.js"]}]}},"display":{"position":"inline"},"visualization":{"visibleModes":["default-mode","edit-mode","comment-mode","brush-mode"],"tools":"viz-builder-tools","removeDuplicates":true,"fields":[{"model":"label","name":"Label","acceptableTypes":["STRING","NUMBER","DATE"],"optional":false,"multifield":true}],"color":{}},"state":{}}
+{
+	"name": "Viz Builder",
+	"icon": "widgets/viz-builder/cogs.svg",
+	"widgetList": {
+		"tags": [
+			"Visualization",
+			"JVChart"
+		]
+	},
+	"showOn": "none",
+	"content": {
+		"template": {
+			"name": "jv-viz viz-builder",
+			"files": [
+				{
+					"serie": true,
+					"files": [
+						"../bower_components/d3_v4/d3.min.js"
+					]
+				},
+				{
+					"files": [
+						"resources/js/jvCharts/jvcharts.min.js"
+					]
+				},
+				{
+					"files": [
+						"standard/chart/chart.css",
+						"resources/js/jvCharts/src/jv.css"
+					]
+				},
+				{
+					"files": [
+						"standard/chart/chart.directive.js",
+						"standard/jv-viz/jv-viz.directive.js",
+						"widgets/viz-builder/viz-builder.directive.js"
+					]
+				}
+			]
+		}
+	},
+	"display": {
+		"position": "inline"
+	},
+	"visualization": {
+		"visibleModes": [
+			"default-mode",
+			"edit-mode",
+			"comment-mode",
+			"brush-mode"
+		],
+		"removeDuplicates": true,
+		"fields": [
+			{
+				"model": "label",
+				"name": "Label",
+				"acceptableTypes": [
+					"STRING",
+					"NUMBER",
+					"DATE"
+				],
+				"optional": false,
+				"multifield": true
+			}
+		],
+		"color": {
+			"label": {
+				"multifield": true,
+				"instances": false
+			}
+		}
+	},
+	"state": {}
+}
