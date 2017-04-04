@@ -119,7 +119,7 @@ const getDependencies = () => {
 
 const buildConfigObj = () => {
     configObj.name = createWidgetName(vizName);
-    configObj.icon = `widgets/${createWidgetName(vizName)}/${icon}.svg`;
+    configObj.icon = `widgets/${vizName}/${icon}.svg`;
     if (isJV) {
         tags.push('JVChart');
     }
