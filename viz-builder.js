@@ -1,16 +1,13 @@
-const readline = require('readline');
+const rl = require('readline-sync');
 const fs       = require('fs');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: 'SEMOSS-viz-scaffold> '
-});
+rl.setDefaultOptions({ prompt: 'SEMOSS-Viz-Scaffold> '});
 let vizName = "";
 let dir = "" ;
 let isJV;
 let icon = "";
 const dependencies = ["../bower_components/d3_v4/d3.min.js"];
 let additionalTools;
+let answer;
 let removeDupes;
 const configObj = {};
 const tags = ["Visualization"];
@@ -19,115 +16,84 @@ const fields = [];
 const color = {};
 const state = {};
 const buildState = () => {
-    rl.question('Add new state data: (press s to stop) ', (answer) => {
-        if (answer.toLowerCase !== 's') {
-            let key = "", 
-                val = "";
-
-            rl.question('Name of key: ', (answer) => {
-                key = answer;
-            });
-            rl.question('Value for key: ', (answer) => {
-                val = answer;
-            });
-
-            state[key] = val;
-
-            buildState();
-        } else {
-            rl.close();
+    while (true) {
+        loopAnswer = rl.question('Add new state data: (press s to stop) ');
+        if (loopAnswer.trim().toLowerCase() === 's') {
+            break;
         }
-    });
+
+        let key = rl.question('Name of key: ');
+        let val = rl.question('Value for key: ');
+
+        state[key] = val;
+    }
 };
 
 const buildFieldsAndColor = () => {
-    rl.question('Add a field: (press s to stop) ', (answer) => {
-        if (answer.toLowerCase !== 's') {
-            const fieldObj = {};
+    while (true) {
+        answer = rl.question('Add a field: (press s to stop adding fields, press enter to add a field) ');
 
-            rl.question('Model: ', (answer) => {
-                fieldObj.model = answer.toLowerCase();
-                rl.close();
-            });
-
-            rl.question('Name: ', (answer) => {
-                answer = answer.toLowerCase();
-                answer = answer.split("");
-                answer[0] = answer[0].toUpperCase();
-                answer = answer.join("");
-                fieldObj.name = answer;
-                rl.close();
-            });
-            
-            //start acceptable types
-            fieldObj.acceptableTypes = [];
-            rl.question('Does this field accept string values? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    fieldObj.acceptableTypes.push("STRING");
-                }
-
-                rl.close();
-            });
-
-            rl.question('Does this field accept numeric values? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    fieldObj.acceptableTypes.push("NUMBER");
-                }
-
-                rl.close();
-            });
-
-            rl.question('Does this field accept date values? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    fieldObj.acceptableTypes.push("DATE");
-                }
-
-                rl.close()
-            });
-            
-            rl.question('Is this field optional? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    fieldObj.optional = true;
-                } else {
-                    fieldObj.optional = false;
-                }
-                
-                rl.close();
-            });
-
-            rl.question('Is this a multi-field? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    fieldObj.multifield = true;
-                } else {
-                    fieldObj.multifield = false;
-                }
-
-                rl.close();
-            });
-
-            fields.push(fieldObj);
-            rl.question('Does this field affect color? (y/n) ', (answer) => {
-                if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                    color[fieldObj.model] = {
-                        multifield: fieldObj.multifield
-                    }
-                    rl.question('Does color depend on instances? (y/n) ', (answer) => {
-                        if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-                            color[fieldObj.model].instances = true;
-                        } else {
-                            color[fieldObj.model].instances = false;
-                        }
-                    });
-                }
-
-                rl.close();
-            });
-            
-            buildFieldsAndColor();
-        } else {
-            rl.close();
+        if (answer.trim().toLowerCase() === 's') {
+            break;
         }
-    });
+        let answer2;
+        const fieldObj = {};
+
+        answer2 = rl.question('Model: ');
+        fieldObj.model = answer2.toLowerCase();
+
+        answer2 = rl.question('Name: ');
+        answer2 = answer2.toLowerCase();
+        answer2 = answer2.split("");
+        answer2[0] = answer2[0].toUpperCase();
+        answer2 = answer2.join("");
+        fieldObj.name = answer2;
+
+        //start acceptable types
+        fieldObj.acceptableTypes = [];
+        answer2 = rl.question('Does this field accept string values? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y') {
+            fieldObj.acceptableTypes.push("STRING");
+        }
+
+        answer2 = rl.question('Does this field accept numeric values? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
+            fieldObj.acceptableTypes.push("NUMBER");
+        }
+
+        answer2 = rl.question('Does this field accept date values? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
+            fieldObj.acceptableTypes.push("DATE");
+        }
+        
+        answer2 = rl.question('Is this field optional? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
+            fieldObj.optional = true;
+        } else {
+            fieldObj.optional = false;
+        }
+
+        answer2 = rl.question('Is this a multi-field? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
+            fieldObj.multifield = true;
+        } else {
+            fieldObj.multifield = false;
+        }
+
+        fields.push(fieldObj);
+        answer2 = rl.question('Does this field affect color? (y/n) ', {limit: ['y','n']});
+        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
+            color[fieldObj.model] = {
+                multifield: fieldObj.multifield
+            };
+            let answer3 = rl.question('Does color depend on instances? (y/n) ', {limit: ['y','n']});
+            if (answer3.toLowerCase() === 'y' || answer3.toLowerCase() === 'yes') {
+                color[fieldObj.model].instances = true;
+            } else {
+                color[fieldObj.model].instances = false;
+            }
+        }
+    }
 };
 
 const createWidgetName = (vizName) => {
@@ -142,19 +108,18 @@ const createWidgetName = (vizName) => {
 };
 
 const getDependencies = () => {
-    rl.question('Path from bower_components: (press s to stop adding dependences) ', (answer) => {
-        if (answer.toLowerCase() !== 's') {
-            dependencies.push(answer);
-        } else {
-            rl.close();
+    while (true) {
+        answer = rl.question('Path from bower_components: (press s to stop adding dependences) ');
+        if (answer.toLowerCase() === 's') {
+            break
         }
-        getDependencies();
-    });
+        dependencies.push(answer);
+    }
 };
 
 const buildConfigObj = () => {
     configObj.name = createWidgetName(vizName);
-    configObj.icon = `widgets/${creatWidgetName(vizName)}/${icon}.svg`;
+    configObj.icon = `widgets/${createWidgetName(vizName)}/${icon}.svg`;
     if (isJV) {
         tags.push('JVChart');
     }
@@ -229,75 +194,52 @@ if (__dirname.split('/').length === 1) {
 
 vizName = dir.toLowerCase();
 
-rl.question('Icon Name: ', (answer) => {
-    icon = answer.split('.svg')[0];
-    
-    rl.close();
-});
+icon = rl.question('Icon Name: ');
+icon = icon.split('.svg')[0];
 
-rl.question('Is this a JV Chart? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        isJV = true;
-    } else {
-        isJV = false;
-    }
 
-    rl.close();
-});
+answer = rl.question('Is this a JV Chart? (y/n) ', {limit: ['y','n']});
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    isJV = true;
+} else {
+    isJV = false;
+}
 
-rl.question('Does this visualization require libraries other than D3? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        getDependencies();
-    } else {
-        rl.close();
-    }
 
-    rl.close();
-});
+answer = rl.question('Does this visualization require libraries other than D3? (y/n) ', {limit: ['y','n']});
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    getDependencies();
+}
 
-rl.question('Enable Edit Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('edit-mode');
-    }
+answer = rl.question('Enable Edit Mode? (y/n) ', {limit: ['y','n']})
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    modes.push('edit-mode');
+}
 
-    rl.close();
-});
+answer = rl.question('Enable Comment Mode? (y/n) ', {limit: ['y','n']});
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    modes.push('comment-mode');
+}
 
-rl.question('Enable Comment Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('comment-mode');
-    }
+answer = rl.question('Enable Brush Mode? (y/n) ', {limit: ['y','n']})
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    modes.push('brush-mode');
+}
 
-    rl.close();
-});
 
-rl.question('Enable Brush Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('brush-mode');
-    }
+answer = rl.question('Does this visualization require additional tools? (y/n) ', {limit: ['y','n']})
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    additionalTools = true;
+} else {
+    additionalTools = false;
+}
 
-    rl.close();
-});
-
-rl.question('Does this visualization require additional tools? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        additionalTools = true;
-    } else {
-        additionalTools = false;
-    }
-
-    rl.close();
-});
-
-rl.question('Do you want to remove duplicated data? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        removeDupes = true;
-    } else {
-        removeDupes = false;
-    }
-
-    rl.close();
-});
+answer = rl.question('Do you want to remove duplicated data? (y/n) ', {limit: ['y','n']})
+if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+    removeDupes = true;
+} else {
+    removeDupes = false;
+}
 
 console.log('Add fields for the visualization');
 
@@ -306,6 +248,8 @@ buildFieldsAndColor();
 console.log('Configure Visualization State');
 
 buildState();
+
+buildConfigObj();
 
 fs.writeFile('config.json', JSON.stringify(configObj), (err) => {
     if (err) {
