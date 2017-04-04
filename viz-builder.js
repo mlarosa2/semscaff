@@ -269,12 +269,12 @@ fs.writeFile('config.json', JSON.stringify(configObj, null, '\t'), (err) => {
 });
 
 let directive;
+const camelCaseViz = toCamelCase(vizName);
+const asChart = `${vizName.toLowerCase().split('-')[0]}Chart`;
 if (isJv) {
-    const camelCaseViz = toCamelCase(vizName);
-    const asChart = `${vizName.toLowerCase().split('-')[0]}Chart`;
     directive = `
     (function () {
-        "use strict";
+        'use strict';
         /**
          * @name ${vizName}
          * @desc directive for creating and visualizing a ${createWidgetName(vizName)} Chart
@@ -394,7 +394,49 @@ if (isJv) {
     })();
     `;
 } else {
-    directive = ``;
+    directive = `
+    (function () {
+        'use strict';
+        /**
+         * @name ${vizName}
+         * @desc directive for creating and visualizing a ${createWidgetName(vizName)} Chart
+         */
+
+        angular.module("app.${vizName}.directive", [])
+            .directive("${camelCaseViz}", ${camelCaseViz});
+        
+        ${camelCaseViz}.$inject = ['$filter'];
+
+        function ${camelCaseViz}($filter) {
+            ${camelCaseViz}Link.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
+
+            return {
+                restrict: 'A',
+                require: ['chart'],
+                priority: 300,
+                link: ${camelCaseViz}Link
+            };
+
+            function ${camelCaseViz}Link(scope, ele, attrs, ctrl) {
+                scope.chartCtrl = ctrl[0];
+
+                var html = '<div style="overflow:hidden" class="append-viz" id=' + scope.chartCtrl.chartName + "-append-viz" + '><div class="absolute-size" id=' + scope.chartCtrl.chartName + '></div></div>';
+                ele.append(html);
+
+                scope.chartCtrl.dataProcessor = function (data) {};
+                scope.chartCtrl.highlightSelectedItem = function (selectedItem) {};
+                scope.chartCtrl.resizeViz = function () {};
+
+                function update(updateData) {}
+
+                //clean up
+                scope.$on('$destroy', function () {
+
+                });
+            }
+        }
+    })();
+    `;
 }
 
 fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
