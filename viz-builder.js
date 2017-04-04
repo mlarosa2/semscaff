@@ -4,24 +4,32 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 const vizName;
+const dir;
 const isJV;
 const icon;
-const dependencies;
+const dependencies = ["../bower_components/d3_v4/d3.min.js"];
 const additionalTools;
 const removeDupes;
-const configObj;
+const configObj = {};
+const tags = ["Visualization"];
 const modes = ["default-mode"];
 const fields = [];
 const color = {};
 const state = {};
 
 if (__dirname.split('/').length === 1) {
-    vizName = __dirname.split('\\')[__dirname.split('\\').length - 1];
+    dir = __dirname.split('\\')[__dirname.split('\\').length - 1];
 } else {
-    vizName = __dirname.split('/')[__dirname.split('/').length - 1];
+    dir = __dirname.split('/')[__dirname.split('/').length - 1];
 }
 
-vizName = vizName.toLowerCase();
+vizName = dir.toLowerCase();
+
+rl.question('Icon Name: ', (answer) => {
+    icon = answer.split('.svg')[0];
+    
+    rl.close();
+});
 
 rl.question('Is this a JV Chart? (y/n) ', (answer) => {
     if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
@@ -33,29 +41,14 @@ rl.question('Is this a JV Chart? (y/n) ', (answer) => {
     rl.close();
 });
 
-rl.question('Icon Name: ', (answer) => {
-    icon = answer.split('.svg')[0];
-    
-    rl.close();
-});
-
-const getDependencies = () => {
-    rl.question('Path from bower_components: (press s to stop adding dependences) ', (answer) => {
-        if (answer.toLowerCase() !== 's') {
-            dependencies.push(answer);
-        } else {
-            rl.close();
-        }
-        getDependencies();
-    });
-};
-
 rl.question('Does this visualization require libraries other than D3? (y/n) ', (answer) => {
     if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
         getDependencies();
     } else {
         rl.close();
     }
+
+    rl.close();
 });
 
 rl.question('Enable Edit Mode? (y/n) ', (answer) => {
@@ -101,6 +94,35 @@ rl.question('Do you want to remove duplicated data? (y/n) ', (answer) => {
 
     rl.close();
 });
+
+console.log('Add fields for the visualization');
+
+buildFieldsAndColor();
+
+console.log('Configure Visualization State');
+
+buildState();
+
+const buildState = () => {
+    rl.question('Add new state data: (press s to stop) ', (answer) => {
+        if (answer.toLowerCase !== 's') {
+            const key, val;
+
+            rl.question('Name of key: ', (answer) => {
+                key = answer;
+            });
+            rl.question('Value for key: ', (answer) => {
+                val = answer;
+            });
+
+            state[key] = val;
+
+            buildState();
+        } else {
+            rl.close();
+        }
+    });
+};
 
 const buildFieldsAndColor = () => {
     rl.question('Add a field: (press s to stop) ', (answer) => {
@@ -167,6 +189,7 @@ const buildFieldsAndColor = () => {
                 rl.close();
             });
 
+            fields.push(fieldObj);
             rl.question('Does this field affect color? (y/n) ', (answer) => {
                 if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
                     color[fieldObj.model] = {
@@ -191,16 +214,93 @@ const buildFieldsAndColor = () => {
     });
 };
 
-console.log('Add fields for the visualization');
+const createWidgetName = (vizName) => {
+    const words = vizName.split("-").map( (word) => {
+        word = word.split("");
+        word[0] = word[0].toUpperCase();
+        
+        return word.join("");
+    });
 
-buildFieldsAndColor();
+    return words.join(" ");
+};
 
-const buildState = () => {
-    rl.question('Add new state data: (press s to stop) ', (answer) => {
-        if (answer.toLowerCase !== 's') {
-            
+const getDependencies = () => {
+    rl.question('Path from bower_components: (press s to stop adding dependences) ', (answer) => {
+        if (answer.toLowerCase() !== 's') {
+            dependencies.push(answer);
         } else {
             rl.close();
         }
+        getDependencies();
     });
+};
+
+const buildConfigObj = () => {
+    configObj.name = createWidgetName(vizName);
+    configObj.icon = `widgets/${creatWidgetName(vizName)}/${icon}.svg`;
+    if (isJV) {
+        tags.push('JVChart');
+    }
+    configObj.widgetList = {
+        tags: tags
+    };
+    configObj.showOn = 'none';
+    configObj.content = {
+        template: {}
+    };
+    if (isJV) {
+        configObj.content.template.name = `jv-viz ${vizName}`;
+    } else {
+        configObj.content.template.name = vizName;
+    }
+    configObj.content.template.files = [
+        {
+            serie: true,
+            files: dependencies
+        }
+    ];
+    if (isJV) {
+        configObj.content.template.files.push({
+            files: ["resources/js/jvCharts/jvcharts.min.js"]
+        });
+        configObj.content.template.files.push({
+            files: [
+                "standard/chart/chart.css",
+                "resources/js/jvCharts/src/jv.css"
+            ]
+        });
+    } else {
+        configObj.content.template.files.push({
+            files: [
+                "standard/chart/chart.css"
+            ]
+        })
+    }
+    const semossFiles = [`standard/chart/chart.directive.js`];
+    if (isJV) {
+        semossFiles.push(`standard/jv-viz/jv-viz.directive.js`);
+    }
+    semossFiles.push(`widgets/${dir}/${vizName}.directive.js`);
+    if (additionalTools) {
+        semossFiles.push(`widgets/${dir}/${vizName}-tools.directive.js`);
+    }
+    configObj.content.template.files.push({
+        files: semossFiles
+    });
+
+    configObj.display = {
+        position: "inline";
+    }
+
+    configObj.visualization = {};
+    configObj.visualization.visibleModes = modes;
+    if (additionalTools) {
+        configObj.visualization.tools = `${vizName}-tools`;
+    }
+    configObj.visualization.removeDuplicates = removeDupes;
+    configObj.visualization.fields = fields;
+    configObj.visualization.color = color;
+
+    configObj.state = state;
 }
