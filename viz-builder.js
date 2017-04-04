@@ -107,6 +107,16 @@ const createWidgetName = (vizName) => {
     return words.join(" ");
 };
 
+const toCamelCase = (vizName) => {
+    vizName = vizName.toLowerCase.split("-");
+    return vizName.map((word, idx) => {
+        if (idx === 0) return;
+        word = word.split("");
+        word[0] = word[0].toUpperCase();
+        return word.join("");
+    }).join("");
+}
+
 const getDependencies = () => {
     while (true) {
         answer = rl.question('Path from bower_components: (press s to stop adding dependencies) ');
@@ -257,3 +267,156 @@ fs.writeFile('config.json', JSON.stringify(configObj, null, '\t'), (err) => {
     }
     console.log('Widget configuration has been created.');
 });
+
+let directive;
+if (isJv) {
+    const camelCaseViz = toCamelCase(vizName);
+    const asChart = `${vizName.toLowerCase().split('-')[0]}Chart`;
+    directive = `
+    (function () {
+        "use strict";
+        /**
+         * @name ${vizName}
+         * @desc directive for creating and visualizing a ${createWidgetName(vizName)} Chart
+         */
+
+        angular.module("app.${vizName}.directive", [])
+            .directive("${camelCaseViz}", ${camelCaseViz});
+        
+        ${camelCaseViz}.$inject = ['$compile', 'VIZ_COLORS', '$filter', 'dataService'];
+
+        function ${camelCaseViz}($compile, VIZ_COLORS, $filter, dataService) {
+            ${camelCaseViz}Link.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
+            ${camelCaseViz}Ctrl.$inject = ['$scope'];
+            return {
+                restrict: 'A',
+                require: ['?chart', '?cleanChart'],
+                priority: 300,
+                link: ${camelCaseViz}Link,
+                controller: ${camelCaseViz}Ctrl
+            };
+
+            function ${camelCaseViz}Link(scope, ele, attrs, ctrl) {
+                scope.chartCtrl = ctrl[0] ? ctrl[0] : ctrl[1];
+
+                /****************Data Functions*************************/
+                scope.chartCtrl.dataProcessor = dataProcessor;
+                /****************Tool Functions*************************/
+                scope.chartCtrl.highlightSelectedItem = highlightSelectedItem;
+                scope.chartCtrl.resizeViz = resizeViz;
+
+                //declare and initialize local variables
+                var ${asChart},
+                    uriData,
+                    html = '<div id=' + scope.chartCtrl.chartName + "-append-viz" + '><div id=' + scope.chartCtrl.chartName + '></div></div>';
+                
+                ele.append($compile(html)(scope));
+
+                /****************Data Functions*************************/
+
+                /**dataProcessor gets called from chart and is where the data manipulation happens for the viz
+                 *
+                 * @param newData
+                 */
+                function dataProcessor(newData) {
+                    var localChartData = JSON.parse(JSON.stringify(newData));
+                    scope.chartCtrl.chartDiv.attr('class', 'chart-div absolute-size');
+
+                    //return and alert the user if no data exists
+                    if (!localChartData.viewData) {
+                        console.log("No data returned from the backend");
+                        return;
+                    }
+
+                    //uriData is used for related insights
+                    uriData = localChartData.data;
+
+                    //filter dataTable
+                    for (var k in localChartData.dataTableAlign) {
+                        localChartData.dataTableAlign[k] = $filter("shortenAndReplaceUnderscores")(localChartData.dataTableAlign[k]);
+                    }
+
+                    var tipConfig = {
+                        type: "simple"
+                    };
+
+                    //create jv chart object
+                    ${asChart} = new jvCharts({
+                        type: "${vizName}.toLowerCase().split('-')[0]",
+                        name: scope.chartCtrl.chartName,
+                        options: localChartData.uiOptions,
+                        chartDiv: scope.chartCtrl.chartDiv,
+                        tipConfig: tipConfig,
+                        localCallbackRelatedInsights: relatedInsights,
+                        localCallbackRemoveHighlight: removeHighlight,
+                        setData: {
+                            data: localChartData.viewData,
+                            dataTable: localChartData.dataTableAlign,
+                            dataTableKeys: localChartData.dataTableKeys,
+                            colors: VIZ_COLORS.COLOR_SEMOSS
+                        },
+                        paint: true
+                    });
+                    //save colors to state
+                    if (ctrl[0]) {
+                        dataService.setState(localChartData.layout, { color: ${asChart}.data.color });
+                    }
+                    update();
+                }
+
+                /****************Update Functions*************************/
+                function update() {
+                    scope.chartCtrl.jvChart = ${asChart};
+                }
+
+                function resizeViz() {
+                    ${asChart}.chartDiv = scope.chartCtrl.chartDiv;
+                    ${asChart}.bar.paint(${asChart});
+                    scope.chartCtrl.initializeModes();
+                }
+
+                function relatedInsights() {}
+
+                /****************Tool Functions*************************/
+                function highlightSelectedItem(selectedItems) {}
+
+                function removeHighlight() {}
+
+                //when directive ends, make sure to clean out excess listeners and dom elements outside of the scope
+                scope.$on("$destroy", function () {
+
+                });
+            }
+        } 
+
+        function  ${camelCaseViz}Ctrl($scope) {}
+    
+    })();
+    `;
+} else {
+    directive = ``;
+}
+
+fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
+    if (err) {
+        throw err;
+    }
+    console.log(`${vizName}.directive.js has been created.`);
+});
+
+if (additionalTools) {
+    let toolsDirective = ``;
+    fs.writeFile(`${vizName}-tools.directive.js`, toolsDirective, (err) => {
+        if (err) {
+            throw err;
+        } 
+        console.log(`${vizName}-tools.directive.js has been created.`);
+    });
+    let toolsHTML = ``;
+    fs.writeFile(`${vizName}-tools.directive.html`, toolsHTML, (err) => {
+        if (err) {
+            throw err;
+        }
+        console.log(`${vizName}-tools.directive.html has been created.`);
+    });
+}
