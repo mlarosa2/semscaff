@@ -1,112 +1,28 @@
 const readline = require('readline');
+const fs       = require('fs');
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    prompt: 'SEMOSS-viz-scaffold> '
 });
-const vizName;
-const dir;
-const isJV;
-const icon;
+let vizName = "";
+let dir = "" ;
+let isJV;
+let icon = "";
 const dependencies = ["../bower_components/d3_v4/d3.min.js"];
-const additionalTools;
-const removeDupes;
+let additionalTools;
+let removeDupes;
 const configObj = {};
 const tags = ["Visualization"];
 const modes = ["default-mode"];
 const fields = [];
 const color = {};
 const state = {};
-
-if (__dirname.split('/').length === 1) {
-    dir = __dirname.split('\\')[__dirname.split('\\').length - 1];
-} else {
-    dir = __dirname.split('/')[__dirname.split('/').length - 1];
-}
-
-vizName = dir.toLowerCase();
-
-rl.question('Icon Name: ', (answer) => {
-    icon = answer.split('.svg')[0];
-    
-    rl.close();
-});
-
-rl.question('Is this a JV Chart? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        isJV = true;
-    } else {
-        isJV = false;
-    }
-
-    rl.close();
-});
-
-rl.question('Does this visualization require libraries other than D3? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        getDependencies();
-    } else {
-        rl.close();
-    }
-
-    rl.close();
-});
-
-rl.question('Enable Edit Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('edit-mode');
-    }
-
-    rl.close();
-});
-
-rl.question('Enable Comment Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('comment-mode');
-    }
-
-    rl.close();
-});
-
-rl.question('Enable Brush Mode? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        modes.push('brush-mode');
-    }
-
-    rl.close();
-});
-
-rl.question('Does this visualization require additional tools? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        additionalTools = true;
-    } else {
-        additionalTools = false;
-    }
-
-    rl.close();
-});
-
-rl.question('Do you want to remove duplicated data? (y/n) ', (answer) => {
-    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
-        removeDupes = true;
-    } else {
-        removeDupes = false;
-    }
-
-    rl.close();
-});
-
-console.log('Add fields for the visualization');
-
-buildFieldsAndColor();
-
-console.log('Configure Visualization State');
-
-buildState();
-
 const buildState = () => {
     rl.question('Add new state data: (press s to stop) ', (answer) => {
         if (answer.toLowerCase !== 's') {
-            const key, val;
+            let key = "", 
+                val = "";
 
             rl.question('Name of key: ', (answer) => {
                 key = answer;
@@ -193,7 +109,7 @@ const buildFieldsAndColor = () => {
             rl.question('Does this field affect color? (y/n) ', (answer) => {
                 if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
                     color[fieldObj.model] = {
-                        multifield: fieldObj.multifield;
+                        multifield: fieldObj.multifield
                     }
                     rl.question('Does color depend on instances? (y/n) ', (answer) => {
                         if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
@@ -290,8 +206,8 @@ const buildConfigObj = () => {
     });
 
     configObj.display = {
-        position: "inline";
-    }
+        position: "inline"
+    };
 
     configObj.visualization = {};
     configObj.visualization.visibleModes = modes;
@@ -304,3 +220,96 @@ const buildConfigObj = () => {
 
     configObj.state = state;
 }
+
+if (__dirname.split('/').length === 1) {
+    dir = __dirname.split('\\')[__dirname.split('\\').length - 1];
+} else {
+    dir = __dirname.split('/')[__dirname.split('/').length - 1];
+}
+
+vizName = dir.toLowerCase();
+
+rl.question('Icon Name: ', (answer) => {
+    icon = answer.split('.svg')[0];
+    
+    rl.close();
+});
+
+rl.question('Is this a JV Chart? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        isJV = true;
+    } else {
+        isJV = false;
+    }
+
+    rl.close();
+});
+
+rl.question('Does this visualization require libraries other than D3? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        getDependencies();
+    } else {
+        rl.close();
+    }
+
+    rl.close();
+});
+
+rl.question('Enable Edit Mode? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        modes.push('edit-mode');
+    }
+
+    rl.close();
+});
+
+rl.question('Enable Comment Mode? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        modes.push('comment-mode');
+    }
+
+    rl.close();
+});
+
+rl.question('Enable Brush Mode? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        modes.push('brush-mode');
+    }
+
+    rl.close();
+});
+
+rl.question('Does this visualization require additional tools? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        additionalTools = true;
+    } else {
+        additionalTools = false;
+    }
+
+    rl.close();
+});
+
+rl.question('Do you want to remove duplicated data? (y/n) ', (answer) => {
+    if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+        removeDupes = true;
+    } else {
+        removeDupes = false;
+    }
+
+    rl.close();
+});
+
+console.log('Add fields for the visualization');
+
+buildFieldsAndColor();
+
+console.log('Configure Visualization State');
+
+buildState();
+
+fs.writeFile('config.json', JSON.stringify(configObj), (err) => {
+    if (err) {
+        throw err;
+    }
+    console.log('Widget configuration has been created.');
+});
