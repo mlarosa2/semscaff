@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "file-system": "^2.2.2",
+    "process": "^0.11.9",
     "readline-sync": "^1.4.7"
   }
 }
