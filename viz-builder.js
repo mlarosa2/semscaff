@@ -272,8 +272,8 @@ const camelCaseViz = toCamelCase(vizName);
 const asChart = `${vizName.toLowerCase().split('-')[0]}Chart`;
 
 if (isJV) {
-    directive = `
-    (function () {
+    directive = 
+    `(function () {
         'use strict';
         /**
          * @name ${vizName}
