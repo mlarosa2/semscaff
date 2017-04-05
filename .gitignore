@@ -4,3 +4,4 @@ viz-builder.directive.js
 viz-builder-tools.directive.*
 .vscode/
 debug.log
+npm-debug.log
