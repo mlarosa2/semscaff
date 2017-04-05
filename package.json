@@ -16,6 +16,9 @@
     "analytics",
     "jvCharts"
   ],
+  "bin": {
+    "semscaff": "./viz-builder.js"
+  },
   "author": "Mark LaRosa",
   "license": "MIT",
   "dependencies": {
