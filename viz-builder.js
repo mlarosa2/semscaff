@@ -448,7 +448,55 @@ fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
 
 if (additionalTools) {
     let toolsDirective = `
-    
+    (function () {
+        'use strict';
+
+        /**
+         * @name ${vizName}
+         * @desc ${createWidgetName(vizName)} additional tools
+         */
+
+        angular.module('app.${vizName}-tools.directive', [])
+            .directive('${toCamelCase(vizName)}Tools', ${toCamelCase(vizName)}Tools);
+        
+        ${toCamelCase(vizName)}Tools.$inject = [];
+
+        function ${toCamelCase(vizName)}Tools() {
+            ${toCamelCase(vizName)}ToolsCtrl.$inject = ['$rootScope', '$scope', 'dataService'];
+            ${toCamelCase(vizName)}ToolsLink.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
+
+            return {
+                restrict: 'EA',
+                scope: {},
+                require: [^toolPanel],
+                controllerAs: '${toCamelCase(vizName)}Tools',
+                bindToController: {},
+                templateUrl: 'widgets/${dir}/${vizName}-tools.dorectove.html',
+                controller: ${toCamelCase(vizName)}ToolsCtrl,
+                link: ${toCamelCase(vizName)}ToolsLink
+            };
+
+            function ${toCamelCase(vizName)}ToolsCtrl($rootScope, $scope, dataService) {
+                var ${vizName}Tools = this;
+
+                ${vizName}Tools.updateVisualization = updateVisualization;
+
+                /**
+                 * @name updateVisualization
+                 * @desc generic function that requires the fn passed in to be a function in the directive
+                 */
+                function updateVisualization(fn, data) {
+                    $scope.toolPanelCtrl.updateState(fn, data);
+                    $scope.toolPanelCtrl.runState();
+                }
+            }
+
+            function ${toCamelCase(vizName)}ToolsLink(scope, ele, attrs, ctrl) {
+                //declare/initialize scope variables
+                scope.toolPanelCtrl = ctrl[0];
+            }
+        }
+    })();
     `;
     fs.writeFile(`${vizName}-tools.directive.js`, toolsDirective, (err) => {
         if (err) {
