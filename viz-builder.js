@@ -110,7 +110,7 @@ const createWidgetName = (vizName) => {
 const toCamelCase = (vizName) => {
     vizName = vizName.toLowerCase().split("-");
     return vizName.map((word, idx) => {
-        if (idx === 0) return;
+        if (idx === 0) return word;
         word = word.split("");
         word[0] = word[0].toUpperCase();
         return word.join("");
@@ -215,7 +215,6 @@ if (answer.toLowerCase() === 'y') {
     isJV = false;
 }
 
-
 answer = rl.question('Does this visualization require libraries other than D3? (y/n) ', {limit: ['y','n']});
 if (answer.toLowerCase() === 'y') {
     getDependencies();
@@ -271,7 +270,8 @@ fs.writeFile('config.json', JSON.stringify(configObj, null, '\t'), (err) => {
 let directive;
 const camelCaseViz = toCamelCase(vizName);
 const asChart = `${vizName.toLowerCase().split('-')[0]}Chart`;
-if (isJv) {
+
+if (isJV) {
     directive = `
     (function () {
         'use strict';
@@ -342,7 +342,7 @@ if (isJv) {
 
                     //create jv chart object
                     ${asChart} = new jvCharts({
-                        type: "${vizName}.toLowerCase().split('-')[0]",
+                        type: "${vizName.toLowerCase().split('-')[0]}",
                         name: scope.chartCtrl.chartName,
                         options: localChartData.uiOptions,
                         chartDiv: scope.chartCtrl.chartDiv,
@@ -371,7 +371,7 @@ if (isJv) {
 
                 function resizeViz() {
                     ${asChart}.chartDiv = scope.chartCtrl.chartDiv;
-                    ${asChart}.bar.paint(${asChart});
+                    ${asChart}.${asChart}.paint(${asChart});
                     scope.chartCtrl.initializeModes();
                 }
 
@@ -391,11 +391,10 @@ if (isJv) {
 
         function  ${camelCaseViz}Ctrl($scope) {}
     
-    })();
-    `;
+    })();`;
 } else {
-    directive = `
-    (function () {
+    directive = 
+    `(function () {
         'use strict';
         /**
          * @name ${vizName}
@@ -435,8 +434,7 @@ if (isJv) {
                 });
             }
         }
-    })();
-    `;
+    })();`;
 }
 
 fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
@@ -447,8 +445,8 @@ fs.writeFile(`${vizName}.directive.js`, directive, (err) => {
 });
 
 if (additionalTools) {
-    let toolsDirective = `
-    (function () {
+    let toolsDirective = 
+    `(function () {
         'use strict';
 
         /**
@@ -457,26 +455,26 @@ if (additionalTools) {
          */
 
         angular.module('app.${vizName}-tools.directive', [])
-            .directive('${toCamelCase(vizName)}Tools', ${toCamelCase(vizName)}Tools);
+            .directive('${camelCaseViz}Tools', ${camelCaseViz}Tools);
         
-        ${toCamelCase(vizName)}Tools.$inject = [];
+        ${camelCaseViz}Tools.$inject = [];
 
-        function ${toCamelCase(vizName)}Tools() {
-            ${toCamelCase(vizName)}ToolsCtrl.$inject = ['$rootScope', '$scope', 'dataService'];
-            ${toCamelCase(vizName)}ToolsLink.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
+        function ${camelCaseViz}Tools() {
+            ${camelCaseViz}ToolsCtrl.$inject = ['$rootScope', '$scope', 'dataService'];
+            ${camelCaseViz}ToolsLink.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
 
             return {
                 restrict: 'EA',
                 scope: {},
                 require: [^toolPanel],
-                controllerAs: '${toCamelCase(vizName)}Tools',
+                controllerAs: '${camelCaseViz}Tools',
                 bindToController: {},
-                templateUrl: 'widgets/${dir}/${vizName}-tools.dorectove.html',
-                controller: ${toCamelCase(vizName)}ToolsCtrl,
-                link: ${toCamelCase(vizName)}ToolsLink
+                templateUrl: 'widgets/${dir}/${vizName}-tools.directive.html',
+                controller: ${camelCaseViz}ToolsCtrl,
+                link: ${camelCaseViz}ToolsLink
             };
 
-            function ${toCamelCase(vizName)}ToolsCtrl($rootScope, $scope, dataService) {
+            function ${camelCaseViz}ToolsCtrl($rootScope, $scope, dataService) {
                 var ${vizName}Tools = this;
 
                 ${vizName}Tools.updateVisualization = updateVisualization;
@@ -491,13 +489,12 @@ if (additionalTools) {
                 }
             }
 
-            function ${toCamelCase(vizName)}ToolsLink(scope, ele, attrs, ctrl) {
+            function ${camelCaseViz}ToolsLink(scope, ele, attrs, ctrl) {
                 //declare/initialize scope variables
                 scope.toolPanelCtrl = ctrl[0];
             }
         }
-    })();
-    `;
+    })();`;
     fs.writeFile(`${vizName}-tools.directive.js`, toolsDirective, (err) => {
         if (err) {
             throw err;
@@ -507,8 +504,7 @@ if (additionalTools) {
     let toolsHTML = `
     <div class="grid12">
 
-    </div>
-    `;
+    </div>`;
     fs.writeFile(`${vizName}-tools.directive.html`, toolsHTML, (err) => {
         if (err) {
             throw err;
