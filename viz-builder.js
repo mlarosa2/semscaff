@@ -468,7 +468,7 @@ if (additionalTools) {
             return {
                 restrict: 'EA',
                 scope: {},
-                require: [^toolPanel],
+                require: ['^toolPanel'],
                 controllerAs: '${camelCaseViz}Tools',
                 bindToController: {},
                 templateUrl: 'widgets/${dir}/${vizName}-tools.directive.html',
@@ -477,9 +477,9 @@ if (additionalTools) {
             };
 
             function ${camelCaseViz}ToolsCtrl($rootScope, $scope, dataService) {
-                var ${vizName}Tools = this;
+                var ${camelCaseViz}Tools = this;
 
-                ${vizName}Tools.updateVisualization = updateVisualization;
+                ${camelCaseViz}Tools.updateVisualization = updateVisualization;
 
                 /**
                  * @name updateVisualization
