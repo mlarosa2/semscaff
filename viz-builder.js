@@ -501,8 +501,8 @@ if (additionalTools) {
         } 
         console.log(`${vizName}-tools.directive.js has been created.`);
     });
-    let toolsHTML = `
-    <div class="grid12">
+    let toolsHTML = 
+    `<div class="grid12">
 
     </div>`;
     fs.writeFile(`${vizName}-tools.directive.html`, toolsHTML, (err) => {
