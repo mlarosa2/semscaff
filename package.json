@@ -6,6 +6,10 @@
   "scripts": {
     "test": "test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlarosa2/SEMOSS-Visualization-Builder.git"
+  },
   "keywords": [
     "SEMOSS",
     "data",
