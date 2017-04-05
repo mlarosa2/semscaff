@@ -17,7 +17,7 @@ const color = {};
 const state = {};
 const buildState = () => {
     while (true) {
-        loopAnswer = rl.question('Add new state data: (press s to stop) ');
+        loopAnswer = rl.question('Add new state data: (press s to stop, press enter to add a new key/value pair) ');
         if (loopAnswer.trim().toLowerCase() === 's') {
             break;
         }
@@ -108,7 +108,7 @@ const createWidgetName = (vizName) => {
 };
 
 const toCamelCase = (vizName) => {
-    vizName = vizName.toLowerCase.split("-");
+    vizName = vizName.toLowerCase().split("-");
     return vizName.map((word, idx) => {
         if (idx === 0) return;
         word = word.split("");
