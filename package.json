@@ -1,5 +1,5 @@
 {
-  "name": "semoss-visualization-builder",
+  "name": "semscaff",
   "version": "1.0.0",
   "description": "A tool to scaffold SEMOSS visualizations",
   "main": "viz-builder.js",
