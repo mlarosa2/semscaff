@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+
 const rl = require('readline-sync');
-const fs       = require('fs');
+const fs = require('fs');
 rl.setDefaultOptions({ prompt: 'SEMOSS-Viz-Scaffold> '});
 let vizName = "";
 let dir = "" ;
