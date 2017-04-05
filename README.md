@@ -11,7 +11,7 @@ command line.
 ## How to use
 To use semscaff, create a new directory under semoss/embed/widgets. The recommended 
 naming convention for this directory is all lower case letters and kebab case if more than one word (ex. parallel-coordinates).
-cd into this directory and on the command line and enter: semscaff.
+cd into this directory and on the command line enter: semscaff.
 
 You will be prompted to answer a few yes or no questions, and some information 
 about the fields required. Upon completion all the necessary files will be generated.
