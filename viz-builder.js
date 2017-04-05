@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-const rl = require('readline-sync');
-const fs = require('fs');
+const rl      = require('readline-sync');
+const fs      = require('fs');
+const process = require('process');
 rl.setDefaultOptions({ prompt: 'SEMOSS-Viz-Scaffold> '});
 let vizName = "";
 let dir = "" ;
@@ -199,9 +200,9 @@ const buildConfigObj = () => {
 }
 
 if (__dirname.split('/').length === 1) {
-    dir = __dirname.split('\\')[__dirname.split('\\').length - 1];
+    dir = process.cwd().split('\\')[__dirname.split('\\').length - 1];
 } else {
-    dir = __dirname.split('/')[__dirname.split('/').length - 1];
+    dir = process.cwd().split('/')[__dirname.split('/').length - 1];
 }
 
 vizName = dir.toLowerCase();
