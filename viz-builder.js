@@ -209,7 +209,7 @@ icon = icon.split('.svg')[0];
 
 
 answer = rl.question('Is this a JV Chart? (y/n) ', {limit: ['y','n']});
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     isJV = true;
 } else {
     isJV = false;
@@ -217,35 +217,35 @@ if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
 
 
 answer = rl.question('Does this visualization require libraries other than D3? (y/n) ', {limit: ['y','n']});
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     getDependencies();
 }
 
 answer = rl.question('Enable Edit Mode? (y/n) ', {limit: ['y','n']})
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     modes.push('edit-mode');
 }
 
 answer = rl.question('Enable Comment Mode? (y/n) ', {limit: ['y','n']});
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     modes.push('comment-mode');
 }
 
 answer = rl.question('Enable Brush Mode? (y/n) ', {limit: ['y','n']})
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     modes.push('brush-mode');
 }
 
 
 answer = rl.question('Does this visualization require additional tools? (y/n) ', {limit: ['y','n']})
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     additionalTools = true;
 } else {
     additionalTools = false;
 }
 
 answer = rl.question('Do you want to remove duplicated data? (y/n) ', {limit: ['y','n']})
-if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+if (answer.toLowerCase() === 'y') {
     removeDupes = true;
 } else {
     removeDupes = false;
