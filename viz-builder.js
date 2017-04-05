@@ -199,10 +199,10 @@ const buildConfigObj = () => {
     configObj.state = state;
 }
 
-if (__dirname.split('/').length === 1) {
-    dir = process.cwd().split('\\')[__dirname.split('\\').length - 1];
+if (process.cwd().split('/').length === 1) {
+    dir = process.cwd().split('\\')[process.cwd().split('\\').length - 1];
 } else {
-    dir = process.cwd().split('/')[__dirname.split('/').length - 1];
+    dir = process.cwd().split('/')[process.cwd().split('/').length - 1];
 }
 
 vizName = dir.toLowerCase();
