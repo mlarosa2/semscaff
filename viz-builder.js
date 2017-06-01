@@ -16,7 +16,6 @@ const configObj = {};
 const tags = ["Visualization"];
 const modes = ["default-mode"];
 const fields = [];
-const color = {};
 const state = {};
 const buildState = () => {
     while (true) {
@@ -32,7 +31,7 @@ const buildState = () => {
     }
 };
 
-const buildFieldsAndColor = () => {
+const buildFields = () => {
     while (true) {
         answer = rl.question('Add a field: (press s to stop adding fields, press enter to add a field) ');
 
@@ -84,18 +83,6 @@ const buildFieldsAndColor = () => {
         }
 
         fields.push(fieldObj);
-        answer2 = rl.question('Does this field affect color? (y/n) ', {limit: ['y','n']});
-        if (answer2.toLowerCase() === 'y' || answer2.toLowerCase() === 'yes') {
-            color[fieldObj.model] = {
-                multifield: fieldObj.multifield
-            };
-            let answer3 = rl.question('Does color depend on instances? (y/n) ', {limit: ['y','n']});
-            if (answer3.toLowerCase() === 'y' || answer3.toLowerCase() === 'yes') {
-                color[fieldObj.model].instances = true;
-            } else {
-                color[fieldObj.model].instances = false;
-            }
-        }
     }
 };
 
@@ -194,7 +181,6 @@ const buildConfigObj = () => {
     }
     configObj.visualization.removeDuplicates = removeDupes;
     configObj.visualization.fields = fields;
-    configObj.visualization.color = color;
 
     configObj.state = state;
 }
@@ -255,7 +241,7 @@ if (answer.toLowerCase() === 'y') {
 
 console.log('Add fields for the visualization');
 
-buildFieldsAndColor();
+buildFields();
 
 console.log('Configure Visualization State');
 
@@ -286,22 +272,24 @@ if (isJV) {
     angular.module("app.${vizName}.directive", [])
         .directive("${camelCaseViz}", ${camelCaseViz});
     
-    ${camelCaseViz}.$inject = ['$compile', 'VIZ_COLORS', '$filter', 'dataService'];
+    ${camelCaseViz}.$inject = ['$compile', 'VIZ_COLORS', '$filter', 'dataService', 'messageService'];
 
-    function ${camelCaseViz}($compile, VIZ_COLORS, $filter, dataService) {
+    function ${camelCaseViz}($compile, VIZ_COLORS, $filter, dataService, messageService) {
         ${camelCaseViz}Link.$inject = ['scope', 'ele', 'attrs', 'ctrl'];
         ${camelCaseViz}Ctrl.$inject = ['$scope'];
         return {
             restrict: 'A',
-            require: ['?chart', '?cleanChart'],
+            require: ['^chart'],
             priority: 300,
             link: ${camelCaseViz}Link,
             controller: ${camelCaseViz}Ctrl
         };
 
         function ${camelCaseViz}Link(scope, ele, attrs, ctrl) {
-            scope.chartCtrl = ctrl[0] ? ctrl[0] : ctrl[1];
+            scope.chartCtrl = ctrl[0];
 
+            /****************Main Event Listeners*************************/
+            var resizeListener = messageService.register('resize-viz', resizeViz);
             /****************Data Functions*************************/
             scope.chartCtrl.dataProcessor = dataProcessor;
             /****************Tool Functions*************************/
@@ -310,10 +298,7 @@ if (isJV) {
 
             //declare and initialize local variables
             var ${asChart},
-                uriData,
-                html = '<div id=' + scope.chartCtrl.chartName + "-append-viz" + '><div id=' + scope.chartCtrl.chartName + '></div></div>';
-            
-            ele.append($compile(html)(scope));
+                uriData;
 
             /****************Data Functions*************************/
 
@@ -352,6 +337,7 @@ if (isJV) {
                     tipConfig: tipConfig,
                     localCallbackRelatedInsights: relatedInsights,
                     localCallbackRemoveHighlight: removeHighlight,
+                    localCallbackApplyEdits: applyAllEdits,
                     setData: {
                         data: localChartData.viewData,
                         dataTable: localChartData.dataTableAlign,
@@ -369,13 +355,18 @@ if (isJV) {
 
             /****************Update Functions*************************/
             function update() {
-                scope.chartCtrl.jvChart = ${asChart};
+                messageService.dispatch('initialize-modes', ${asChart});
+                dataService.visualLoaded();
             }
 
             function resizeViz() {
                 ${asChart}.chartDiv = scope.chartCtrl.chartDiv;
-                ${asChart}.${asChart}.paint(${asChart});
-                scope.chartCtrl.initializeModes();
+                ${asChart}.${asChart}.paint.call(${asChart}, 0);
+                messageService.dispatch('initialize-modes', ${asChart});
+            }
+
+            function applyAllEdits() {
+                scope.chartCtrl.editMode.applyAllEdits();
             }
 
             function relatedInsights() {}
