@@ -158,11 +158,8 @@ const buildConfigObj = () => {
             ]
         })
     }
-    const semossFiles = [`standard/chart/chart.directive.js`];
-    if (isJV) {
-        semossFiles.push(`standard/jv-viz/jv-viz.directive.js`);
-    }
-    semossFiles.push(`widgets/${dir}/${vizName}.directive.js`);
+
+    const semossFiles = [`widgets/${dir}/${vizName}.directive.js`];
     if (additionalTools) {
         semossFiles.push(`widgets/${dir}/${vizName}-tools.directive.js`);
     }
