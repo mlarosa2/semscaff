@@ -8,7 +8,7 @@ let vizName = "";
 let dir = "" ;
 let isJV;
 let icon = "";
-const dependencies = ["../bower_components/d3_v4/d3.min.js"];
+const dependencies = ["node_modules/d3/build/d3.min.js"];
 let additionalTools;
 let answer;
 let removeDupes;
@@ -109,11 +109,11 @@ const toCamelCase = (vizName) => {
 
 const getDependencies = () => {
     while (true) {
-        answer = rl.question('Path from bower_components: (press s to stop adding dependencies) ');
+        answer = rl.question('Path from node_modules: (press s to stop adding dependencies) ');
         if (answer.toLowerCase() === 's') {
             break
         }
-        dependencies.push(`../bower_components/${answer}`);
+        dependencies.push(`node_modules/${answer}`);
     }
 };
 
