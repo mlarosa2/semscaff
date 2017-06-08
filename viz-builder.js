@@ -109,11 +109,15 @@ const toCamelCase = (vizName) => {
 
 const getDependencies = () => {
     while (true) {
-        answer = rl.question('Path from node_modules: (press s to stop adding dependencies) ');
+        answer = rl.question('Path from node_modules: (s to stop, r to add path from resources) ');
         if (answer.toLowerCase() === 's') {
             break
         }
-        dependencies.push(`node_modules/${answer}`);
+        if (answer.toLowerCase() === 'r') {
+            dependencies.push(`resources/${answer}`);
+        } else {
+            dependencies.push(`node_modules/${answer}`);
+        }
     }
 };
 
