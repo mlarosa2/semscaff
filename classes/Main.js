@@ -12,6 +12,7 @@ class Main {
      * @desc parses arguments and intializes the appropriate class
      */
     initialize() {
+        const answer;
         const acceptableVizArgs = ['viz', 'visual', 'visualization', 'visualize', 'vis'];
         const acceptableDWArgs  = ['default', 'widget', 'dw', 'default-widget'];
         if (!!this.clArg) {
@@ -20,32 +21,29 @@ class Main {
             } else if (acceptableDWArgs.include(this.clArg)) {
                 initWidget();
             } else {
-                console.log(`Sorry, ${this.clArg} is not an understood command. Enter visualization to create a visualization, default to create a default-widget, or quit to exit the program.`);
-                this.vizWidgetOrQuit();
+                answer = rl.question(`Sorry, ${this.clArg} is not an understood command. Enter visualization to create a visualization, default to create a default-widget, or quit to exit the program.`);
+                this.vizWidgetOrQuit(answer);
             }
         } else {
-            console.log('Enter visualization to create a visualization, default to create a default-widget, or quit to exit the program.');
-            this.vizWidgetOrQuit();
+            answer = rl.question('Enter visualization to create a visualization, default to create a default-widget, or quit to exit the program.');
+            this.vizWidgetOrQuit(answer);
         }
     }
 
     /**
      * @name vizWidgetOrQuit
+     * @param {string} answer result from question
      * @desc starts a command line loop to find out if the program should create a visualization,
      *       a widget, or quit
      */
-    vizWidgetOrQuit() {
-        rl.promptCLLoop({
-            visualization: function () {
-                initViz();
-            },
-            default: function () {
-                initWidget();
-            },
-            quit: function () {
-                return true;
-            }
-        });
+    vizWidgetOrQuit(answer) {
+        if (answer === 'visualization') {
+            initViz();
+        } else if (answer === 'default') {
+            initWidget();
+        } else if (answer === 'quit') {
+            this.initialize();
+        }
     }
 
     /**
