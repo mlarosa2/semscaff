@@ -86,26 +86,6 @@ const buildFields = () => {
     }
 };
 
-const createWidgetName = (vizName) => {
-    const words = vizName.split("-").map( (word) => {
-        word = word.split("");
-        word[0] = word[0].toUpperCase();
-        
-        return word.join("");
-    });
-
-    return words.join(" ");
-};
-
-const toCamelCase = (vizName) => {
-    vizName = vizName.toLowerCase().split("-");
-    return vizName.map((word, idx) => {
-        if (idx === 0) return word;
-        word = word.split("");
-        word[0] = word[0].toUpperCase();
-        return word.join("");
-    }).join("");
-}
 
 const getDependencies = () => {
     while (true) {
@@ -186,11 +166,7 @@ const buildConfigObj = () => {
     configObj.state = state;
 }
 
-if (process.cwd().split('/').length === 1) {
-    dir = process.cwd().split('\\')[process.cwd().split('\\').length - 1];
-} else {
-    dir = process.cwd().split('/')[process.cwd().split('/').length - 1];
-}
+getDir()
 
 vizName = dir.toLowerCase();
 
