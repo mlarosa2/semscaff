@@ -5,6 +5,7 @@ class Utilities {
      * @name toCamelCase
      * @param {string} vizName name of the visualization
      * @return {string}
+     * @desc converts a string in kebab case to camel case
      */
     static toCamelCase(vizName) {
         vizName = vizName.toLowerCase().split("-");
@@ -20,6 +21,7 @@ class Utilities {
      * @name createWidgetName
      * @param {string} vizName name of the visualization
      * @return {string}
+     * @desc creates a widget name from kebab case to SEMOSS format
      */
     static createWidgetName(vizName) {
         const words = vizName.split("-").map( (word) => {
@@ -32,6 +34,11 @@ class Utilities {
         return words.join(" ");
     }
 
+    /**
+     * @name getDir
+     * @return {string}
+     * @desc returns directory name
+     */
     static getDir() {
         if (process.cwd().split('/').length === 1) {
             return process.cwd().split('\\')[process.cwd().split('\\').length - 1];
