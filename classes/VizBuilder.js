@@ -333,3 +333,5 @@ class VizBuilder {
         return false;
     }
 }
+
+module.exports = VizBuilder;
