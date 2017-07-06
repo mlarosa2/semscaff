@@ -66,3 +66,5 @@ class Utilities {
         }).join("");
     }
 }
+
+module.exports = Utilities;
