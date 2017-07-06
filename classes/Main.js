@@ -12,7 +12,7 @@ class Main {
      * @desc parses arguments and intializes the appropriate class
      */
     initialize() {
-        const answer;
+        let answer;
         const acceptableVizArgs = ['viz', 'visual', 'visualization', 'visualize', 'vis'];
         const acceptableDWArgs  = ['default', 'widget', 'dw', 'default-widget'];
         if (!!this.clArg) {
@@ -64,3 +64,5 @@ class Main {
         widget.initialize();
     }
 }
+
+module.exports = Main;
