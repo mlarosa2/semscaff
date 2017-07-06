@@ -3,7 +3,7 @@
 const rl      = require('readline-sync');
 const fs      = require('fs');
 const process = require('process');
-rl.setDefaultOptions({ prompt: 'SEMOSS-Viz-Scaffold> '});
+rl.setDefaultOptions({ prompt: 'SEMOSS-CLI> '});
 let vizName = "";
 let dir = "" ;
 let isJV;
