@@ -15,11 +15,12 @@ class Main {
         let answer;
         const acceptableVizArgs = ['viz', 'visual', 'visualization', 'visualize', 'vis'];
         const acceptableDWArgs  = ['default', 'widget', 'dw', 'default-widget'];
+        
         if (!!this.clArg) {
-            if (acceptableVizArgs.include(this.clArg)) {
-                initViz();
-            } else if (acceptableDWArgs.include(this.clArg)) {
-                initWidget();
+            if (acceptableVizArgs.includes(this.clArg)) {
+                this.initViz();
+            } else if (acceptableDWArgs.includes(this.clArg)) {
+                this.initWidget();
             } else {
                 answer = rl.question(`Sorry, ${this.clArg} is not an understood command. Enter visualization to create a visualization, default to create a default-widget, or quit to exit the program.`);
                 this.vizWidgetOrQuit(answer);
@@ -38,9 +39,9 @@ class Main {
      */
     vizWidgetOrQuit(answer) {
         if (answer === 'visualization') {
-            initViz();
+            this.initViz();
         } else if (answer === 'default') {
-            initWidget();
+            this.initWidget();
         } else if (answer === 'quit') {
             this.initialize();
         }
@@ -52,7 +53,7 @@ class Main {
      */
     initViz() {
         const viz = new VizBuilder();
-        viz.initialize();
+        viz.initViz();
     }
 
     /**
