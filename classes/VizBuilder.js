@@ -60,7 +60,6 @@ class VizBuilder {
         this.buildConfig();
 
         let fs = new FileSaving(this.configObj);
-        fs.buildDirective();
         fs.save();
     }
 
