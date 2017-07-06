@@ -46,4 +46,23 @@ class Utilities {
             return process.cwd().split('/')[process.cwd().split('/').length - 1];
         }
     }
+
+    /**
+     * @name pascalToKebab
+     * @desc takes a pascal case string and returns a lower kebab case string
+     * @param {string} str
+     * @return {string}
+     */
+    static pascalToKebab(str) {
+        str = str.split("");
+        return str.map((letter, idx) => {
+            if (idx === 0) {
+                return letter.toLowerCase();
+            } else if (letter === letter.toUpperCase()) {
+                return `-${letter.toLowerCase()}`;
+            } else {
+                return letter;
+            }
+        }).join("");
+    }
 }
