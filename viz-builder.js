@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-//test commit
 
 const rl      = require('readline-sync');
 const fs      = require('fs');
