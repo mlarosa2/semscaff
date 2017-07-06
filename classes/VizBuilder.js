@@ -1,9 +1,9 @@
 const rl         = require('readline-sync');
-const Utitlities = require('./Utils.js');
+const Utilities = require('./Utils.js');
+const FileSaving = require('./FileSaving.js');
 
 class VizBuilder {
     constructor() {
-        this.configObj;
         this.vizName;
         this.icon;
         this.dependencies;
@@ -22,6 +22,7 @@ class VizBuilder {
             'Save / Share / Export': ['save', 'share', 'embed-link', 'export-csv', 'export-jpeg', 'expor-svg', 'tableau-connect']
         };
         
+        this.configObj       = {};
         this.template        = {};
         this.files           = [{'serie': true, 'files': ['node_modules/d3/build/d3.min.js']}];
         this.modes           = ['default-mode'];
@@ -46,6 +47,7 @@ class VizBuilder {
         // this.addDependencies(); commenting out until more complex behavior is needed, until then hard coding D3
         this.addChartingLibrary();
         this.completeFilesArray();
+        this.template.files = this.files
         this.setModes();
 
         this.removeDuplicates = this.shouldChartHaveDupes();
@@ -55,6 +57,11 @@ class VizBuilder {
         this.color = this.setColor();
 
         this.setState();
+        this.buildConfig();
+
+        let fs = new FileSaving(this.configObj);
+        fs.buildDirective();
+        fs.save();
     }
 
     /**
@@ -85,7 +92,7 @@ class VizBuilder {
 
         while (addMore) {
             answer = rl.question('Press enter to add additional tools (press s to stop): ');
-            if (_breakLoop(answer, 's')) {
+            if (this._breakLoop(answer, 's')) {
                 addMore = false;
                 continue;
             }
@@ -112,7 +119,7 @@ class VizBuilder {
         let addMore = true, answer;
         
         while (addMore) {
-            if (_breakLoop(answer, 's')) {
+            if (this._breakLoop(answer, 's')) {
                 addMore = false;
                 continue
             }
@@ -127,7 +134,7 @@ class VizBuilder {
      */
     addChartingLibrary() {
         let answer;
-        answer = rl.question('Add path to charting library: (type none if there is none');
+        answer = rl.question('Add path to charting library (type none if there is none): ');
         if (answer === 'none') {
             this.files.push({});
         } else {
@@ -210,17 +217,17 @@ class VizBuilder {
                 'optional': false,
                 'multiField': false
             };
-            let answer, str, num, date, optional, multiField;
+            let answer, answer2, str, num, date, optional, multiField;
             
             answer = rl.question('What is the name of the field? (press s to stop)');
-            if (_breakLoop(answer, 's')) {
+            if (this._breakLoop(answer, 's')) {
                 addMore = false;
                 continue;
             }
 
             fieldObj['model'] = answer.toLowerCase();
-            answer[0]         = answer[0].toUpperCase();
-            fieldObj['value'] = answer; 
+            answer2           = answer[0].toUpperCase() + answer.substr(1);
+            fieldObj['value'] = answer2; 
 
             str  = rl.question('Does this field accept string values? (y/n)', {limit: ['y', 'n']});
             num  = rl.question ('Does this field accept number values? (y/n)', {limt: ['y', 'n']});
@@ -233,7 +240,7 @@ class VizBuilder {
                 fieldObj['acceptableTypes'].push('NUMBER');
             }
             if (date.toLowerCase() === 'y') {
-                fieldObj['acceptaleTypes'].push('DATE');
+                fieldObj['acceptableTypes'].push('DATE');
             }
 
             optional   = rl.question('Is this field optional? (y/n)', {limit: ['y', 'n']});
@@ -249,7 +256,7 @@ class VizBuilder {
                 this.multiFieldCheck[fieldObj['model']] = true;
             }
 
-            this.field.push(fieldObj);
+            this.fields.push(fieldObj);
         }
     }
 
@@ -268,7 +275,7 @@ class VizBuilder {
 
             answer = rl.question('What is the name of the field to color on? (press s to stop)');
             
-            if (_breakLoop(answer, 's')) {
+            if (this._breakLoop(answer, 's')) {
                 addMore = false;
                 continue;
             }
@@ -307,17 +314,48 @@ class VizBuilder {
 
             key = rl.question('Add a key to the state object. (press s to stop)');
 
-            if (_breakLoop(key, 's')) {
+            if (this._breakLoop(key, 's')) {
                 addMore = false;
                 continue;
             }
 
-            value = rl.question (`Add a value for ${key}`);
+            value = rl.question (`Add a value for ${key}: `);
             
             this.state[key] = value;
         }
     }
  
+    /**
+     * @name buildConfig
+     * @desc builds the config object to send to FileSave instance
+     */
+    buildConfig() {
+        this.configObj.name = this.vizName;
+        this.configObj.icon = this.icon;
+        this.configObj.widgetList = {
+            tags: this.tags,
+            showOn: "none",
+            hideHandles: this.hideHandles,
+            contextMenu: this.contextMenu,
+
+        };
+        this.configObj.content = {
+            template: this.template,
+        };
+        this.configObj.display = {
+            position: "inline"
+        };
+        this.configObj.visualization = {
+            visibleModes: this.modes,
+            showOnVisualPanel: true,
+            tools: "",
+            removeDuplicates: this.removeDuplicates,
+            fields: this.fields,
+            color: this.color
+        };
+        this.configObj.state = this.state
+    }
+
     /**
      * @name _breakLoop
      * @param {string} ans 
